@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Analysis: The "Unlock Your Focus" ADHD Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Slate, Stone, Zinc) with a supportive Teal accent. -->
+    <!-- Application Structure Plan: The SPA is designed as a narrative journey to educate the user. It starts with a foundational understanding of ADHD strengths, moves to the core interactive planner where users can click elements to see their purpose, explores practical strategies with a conceptual visualization, and concludes with recommendations. This thematic, interactive flow was chosen over a linear report dump because it encourages exploration and directly links the tool's features to the 'why' behind them, enhancing understanding and retention for the user. -->
+    <!-- Visualization & Content Choices: The central 'visualization' is an interactive HTML replica of the planner itself. Goal: Relate tool features to their benefits. Method: HTML form with JS event listeners. Interaction: Clicking a planner element dynamically displays its analysis. Justification: This is more impactful than a static image and directly serves the report's purpose. A conceptual Donut chart (Chart.js) is used to illustrate the 'Energy Management' strategy, providing a visual metaphor for a balanced day, a key concept from the report. All other diagrams are built with structured HTML/Tailwind. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .active-feature { background-color: #ccfbf1; border-color: #14b8a6; }
+        .nav-link { transition: color 0.2s, border-bottom-color 0.2s; }
+        .nav-link:hover, .nav-link.active { color: #14b8a6; border-bottom-color: #14b8a6; }
+        .strategy-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .strategy-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .chart-container { position: relative; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; height: auto; max-height: 400px; }
+        .celebration-toast {
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .suggestion-item { transition: background-color 0.2s; }
+        .suggestion-item:hover { background-color: #f1f5f9; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-200">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-teal-600">Cognitive Edge</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#strengths" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 border-b-2 border-transparent">Strengths</a>
+                        <a href="#planner" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 border-b-2 border-transparent">Interactive Planner</a>
+                        <a href="#strategies" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 border-b-2 border-transparent">Strategies</a>
+                        <a href="#improvements" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 border-b-2 border-transparent">Improvements</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section id="intro" class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">Unlock Your Focus</h1>
+            <p class="max-w-3xl mx-auto text-lg text-slate-600">
+                An interactive analysis of a daily planning tool designed for the unique strengths of the ADHD cognitive style. Explore how to turn neurodivergence into your greatest advantage.
+            </p>
+        </section>
+
+        <section id="strengths" class="mb-16">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-900">The ADHD Advantage</h2>
+                <p class="mt-2 text-md text-slate-600 max-w-2xl mx-auto">ADHD is not a deficit, but a different cognitive wiring with powerful inherent strengths. This section explores these assets. Click on a strength to learn more about how it manifests and can be leveraged.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="strength-creativity" class="strength-card-container p-6 bg-white rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-xl mb-2 text-teal-700">🎨 Boundless Creativity</h3>
+                    <p class="text-slate-600">A nonlinear thinking style fosters innovative problem-solving by connecting seemingly unrelated ideas. This leads to groundbreaking insights in art, science, and business.</p>
+                </div>
+                <div id="strength-hyperfocus" class="strength-card-container p-6 bg-white rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-xl mb-2 text-teal-700">🚀 Hyperfocus</h3>
+                    <p class="text-slate-600">The ability to enter a state of profound immersion in stimulating tasks. This "deep work" superpower enables rapid skill mastery and incredible productivity in areas of passion.</p>
+                </div>
+                <div id="strength-adaptability" class="strength-card-container p-6 bg-white rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-xl mb-2 text-teal-700">⚡️ Quick Thinking & Adaptability</h3>
+                    <p class="text-slate-600">A knack for thriving in dynamic environments. Quick thinking enables creative solutions under pressure, resourcefulness, and the ability to pivot effectively when circumstances change.</p>
+                </div>
+                 <div id="strength-energy" class="strength-card-container p-6 bg-white rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-xl mb-2 text-teal-700">🔋 High Energy & Enthusiasm</h3>
+                    <p class="text-slate-600">When channeled, "hyperactivity" becomes infectious energy and drive. This passion can motivate teams, fuel determination, and lead to relentless productivity on projects.</p>
+                </div>
+                 <div id="strength-resilience" class="strength-card-container p-6 bg-white rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-xl mb-2 text-teal-700">💪 Resilience</h3>
+                    <p class="text-slate-600">Constantly adapting to a world not built for your brain fosters remarkable resilience. This creates an exceptional ability to navigate setbacks and persevere through challenges.</p>
+                </div>
+                 <div id="strength-summary" class="strength-card-container p-6 bg-teal-50 rounded-xl border border-teal-200">
+                    <h3 class="font-bold text-xl mb-2 text-teal-800">Harnessing Your Strengths</h3>
+                    <p class="text-teal-700">Understanding these attributes is the first step. The right tools and strategies empower you to leverage this unique cognitive profile for success and fulfillment.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="planner" class="mb-16">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-900">The Interactive Planner</h2>
+                <p class="mt-2 text-md text-slate-600 max-w-2xl mx-auto">This is a digital, interactive version of the "Unlock Your Focus" sheet. Click on any labeled feature (like "Action Task" or "Difficulty") to see an expert analysis of *why* it works for the ADHD brain. Experiment by typing in the fields.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div id="feature-daily_focus" class="p-2 rounded-lg border border-transparent cursor-pointer">
+                        <label for="date-input" class="font-bold text-slate-500 text-sm tracking-wider">DAILY FOCUS</label>
+                        <input id="date-input" type="text" placeholder="Enter today's date..." class="w-full text-lg font-bold text-slate-800 border-0 border-b-2 border-slate-200 focus:ring-0 focus:border-teal-500 p-1">
+                    </div>
+                    
+                    <div id="feature-action_task" class="mt-4 p-2 rounded-lg border border-transparent cursor-pointer">
+                        <label for="action-task-1" class="font-bold text-slate-500 text-sm tracking-wider">ACTION TASK</label>
+                        <div class="flex items-center space-x-2 mt-1">
+                             <input type="text" placeholder="___:___" class="w-20 p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                             <input id="action-task-1" type="text" placeholder="Enter a key task..." class="w-full p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                         <div class="flex items-center space-x-2 mt-2">
+                             <input type="text" placeholder="___:___" class="w-20 p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                             <input type="text" placeholder="Another key task..." class="w-full p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                    </div>
+                    
+                    <div id="feature-task_list" class="mt-4 p-2 rounded-lg border border-transparent cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <label class="font-bold text-slate-500 text-sm tracking-wider">TASK LIST</label>
+                            <label id="feature-difficulty" class="font-semibold text-slate-500 text-xs tracking-wider cursor-pointer">Difficulty</label>
+                        </div>
+                         <div class="flex items-center space-x-2 mt-1">
+                             <span class="text-slate-500">1.</span>
+                             <input type="text" placeholder="Low-effort task..." class="w-full p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                             <input type="number" min="1" max="3" placeholder="1-3" class="w-16 p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                         </div>
+                        <div class="flex items-center space-x-2 mt-2">
+                             <span class="text-slate-500">2.</span>
+                             <input type="text" placeholder="Medium-effort task..." class="w-full p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                             <input type="number" min="4" max="7" placeholder="4-7" class="w-16 p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                         </div>
+                         <div class="flex items-center space-x-2 mt-2">
+                             <span class="text-slate-500">3.</span>
+                             <input type="text" placeholder="High-effort task..." class="w-full p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                             <input type="number" min="8" max="10" placeholder="8-10" class="w-16 p-1 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                         </div>
+                    </div>
+
+                    <div id="feature-brainstorm" class="mt-4 p-2 rounded-lg border border-transparent cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <label class="font-bold text-slate-500 text-sm tracking-wider">DAILY BRAINSTORM TASK</label>
+                            <div>
+                                <span id="brainstorm-difficulty" class="text-sm font-bold text-teal-600 mr-3"></span>
+                                <button id="brainstorm-ideas-btn" class="text-sm text-teal-600 font-semibold hover:text-teal-700">Need Ideas?</button>
+                            </div>
+                        </div>
+                         <div class="mt-2 p-4 bg-slate-100 rounded-lg">
+                            <textarea id="brainstorm-input" rows="3" placeholder="Define your own 'thinking task' for the day..." class="w-full p-2 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea>
+                            <div class="mt-4 flex space-x-2">
+                                <button id="brainstorm-achieved" class="w-full bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors">Achieved!</button>
+                                <button id="brainstorm-skip" class="w-full bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg hover:bg-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition-colors">Clear / Not Achieved</button>
+                            </div>
+                         </div>
+                         <div id="brainstorm-celebration" class="celebration-toast opacity-0 transform -translate-y-4 mt-3 text-center p-2 bg-green-100 text-green-800 rounded-lg">Great job on your thinking task!</div>
+                    </div>
+
+                    <div id="feature-achievements" class="mt-4 p-2 rounded-lg border border-transparent cursor-pointer">
+                        <label for="achievements-input" class="font-bold text-slate-500 text-sm tracking-wider">DAILY ACHIEVEMENTS</label>
+                        <textarea id="achievements-input" rows="3" placeholder="Record your wins, big or small! What did you accomplish today?" class="w-full mt-1 p-2 border-slate-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea>
+                    </div>
+                </div>
+                
+                <div id="analysis-pane" class="bg-white p-6 rounded-xl border-2 border-teal-500 shadow-lg min-h-[300px]">
+                    <h3 id="analysis-title" class="font-bold text-xl text-teal-700 mb-2">Analysis Panel</h3>
+                    <p id="analysis-text" class="text-slate-700">Click on a labeled feature on the planner to the left to see why it's effective. The analysis will appear here. Let's start!</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="strategies" class="mb-16">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-900">Strategies for Success</h2>
+                <p class="mt-2 text-md text-slate-600 max-w-2xl mx-auto">The planner is a powerful tool on its own, but its impact is amplified when combined with other evidence-based strategies. This section introduces techniques to maximize your daily effectiveness.</p>
+            </div>
+             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                 <div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="strategy-card bg-white p-4 rounded-lg border border-slate-200">
+                            <h4 class="font-semibold text-slate-800">Time Blocking</h4>
+                            <p class="text-sm text-slate-600">Assign specific time blocks to tasks. This creates structure and helps manage "time blindness".</p>
+                        </div>
+                         <div class="strategy-card bg-white p-4 rounded-lg border border-slate-200">
+                            <h4 class="font-semibold text-slate-800">Task Batching</h4>
+                            <p class="text-sm text-slate-600">Group similar small tasks (like emails) into one block for a quick sense of accomplishment.</p>
+                        </div>
+                        <div class="strategy-card bg-white p-4 rounded-lg border border-slate-200">
+                            <h4 class="font-semibold text-slate-800">Body Doubling</h4>
+                            <p class="text-sm text-slate-600">Work alongside another person (physically or virtually) to improve focus and persistence.</p>
+                        </div>
+                        <div class="strategy-card bg-white p-4 rounded-lg border border-slate-200">
+                            <h4 class="font-semibold text-slate-800">Temptation Bundling</h4>
+                            <p class="text-sm text-slate-600">Pair a task you need to do with an activity you enjoy, like listening to a podcast while doing chores.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200">
+                    <h4 class="text-center font-bold text-lg text-slate-800 mb-2">Conceptualizing Energy Management</h4>
+                     <p class="text-center text-sm text-slate-600 mb-4">The "Difficulty" rating helps you balance your day. This chart illustrates a balanced day, mixing high-effort tasks with easier ones to maintain momentum and avoid burnout. It's a visual goal, not a rigid rule.</p>
+                    <div class="chart-container">
+                        <canvas id="difficultyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="improvements" class="bg-white p-8 rounded-xl border border-slate-200">
+             <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">Future-Proofing the Tool</h2>
+                <p class="mt-2 text-md text-slate-600 max-w-2xl mx-auto">While powerful, the planner can be enhanced. These recommendations focus on improving usability and integrating it more deeply into a holistic support system.</p>
+            </div>
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                 <div class="p-4 rounded-lg bg-slate-100">
+                     <h4 class="font-semibold text-slate-800">Clearer Guidance</h4>
+                     <p class="text-sm text-slate-600">Add small hints or a guide on how to best use the time slots and the difficulty rating for more consistent application.</p>
+                 </div>
+                 <div class="p-4 rounded-lg bg-slate-100">
+                     <h4 class="font-semibold text-slate-800">"Carry-Over" Section</h4>
+                     <p class="text-sm text-slate-600">A dedicated space for unfinished tasks reduces guilt and makes re-prioritizing for the next day a non-judgmental process.</p>
+                 </div>
+                 <div class="p-4 rounded-lg bg-slate-100">
+                     <h4 class="font-semibold text-slate-800">Weekly Review Prompt</h4>
+                     <p class="text-sm text-slate-600">A simple checkbox to encourage a weekly review helps users identify patterns in their productivity, challenges, and successes over time.</p>
+                 </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Brainstorm Ideas Modal -->
+    <div id="ideas-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="text-lg font-bold">Brainstorm Task Ideas</h3>
+                <button id="close-modal-btn" class="text-slate-500 hover:text-slate-800 text-2xl">&times;</button>
+            </div>
+            <ul id="suggestions-list" class="p-4 max-h-64 overflow-y-auto">
+                <!-- Suggestions will be populated by JS -->
+            </ul>
+        </div>
+    </div>
+
+    <footer class="bg-slate-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm">
+            <p>This interactive analysis is based on the "Unlock Your Focus" document. Designed to be an educational tool.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const analysisData = {
+                'daily_focus': {
+                    title: 'Daily Focus & Date',
+                    text: "This simple header anchors you to the present day, establishing a clear starting point. For a brain that can struggle with time awareness ('time blindness'), this act of daily orientation creates a crucial routine and reduces temporal disorientation."
+                },
+                'action_task': {
+                    title: 'Action Task & Time Slots',
+                    text: "This is the core task management section. The time slots encourage 'time blocking'—allocating specific times for tasks. This externalizes your intentions, making tasks more concrete and significantly aiding initiation. It breaks the day into manageable chunks, reducing overwhelm."
+                },
+                'task_list': {
+                    title: 'Task List',
+                    text: 'This area allows for a more detailed breakdown of your "Action Tasks" or for listing smaller to-dos. Writing tasks down externalizes them from your working memory, freeing up mental resources for focusing on the task itself rather than trying to remember what to do next.'
+                },
+                'difficulty': {
+                    title: 'Difficulty Rating',
+                    text: "A powerful feature for self-regulation. Rating a task's difficulty prompts you to consider its executive function load. This helps you match tasks to your current energy levels, avoid burnout by balancing hard and easy tasks, and strategically build momentum throughout the day. The constrained levels help categorize tasks for balanced planning."
+                },
+                'brainstorm': {
+                    title: 'User-Driven Brainstorm Task with Adaptive Difficulty',
+                    text: "This hybrid section empowers you to define your own 'thinking task.' If needed, the 'Need Ideas?' button provides suggestions. The adaptive difficulty score gamifies the process: when you mark your self-defined task as 'Achieved,' the difficulty for the next day increases, providing a gentle challenge. If you mark it 'Not Achieved,' it decreases, ensuring the tool adapts to your energy levels. This combines user autonomy with a motivating, responsive feedback loop."
+                },
+                'achievements': {
+                    title: 'Daily Achievements',
+                    text: "Crucial for positive reinforcement. The ADHD brain responds strongly to immediate feedback. Recording your wins, no matter how small, provides a tangible dopamine boost, combats negative self-talk, and builds self-efficacy by creating visible evidence of your productivity."
+                }
+            };
+
+            const analysisTitleEl = document.getElementById('analysis-title');
+            const analysisTextEl = document.getElementById('analysis-text');
+            const features = document.querySelectorAll('[id^="feature-"]');
+            let currentFeature = null;
+
+            features.forEach(feature => {
+                feature.addEventListener('click', () => {
+                    const featureId = feature.id.replace('feature-', '');
+                    
+                    if (analysisData[featureId]) {
+                        if(currentFeature) {
+                            currentFeature.classList.remove('active-feature');
+                        }
+                        feature.classList.add('active-feature');
+                        currentFeature = feature;
+
+                        analysisTitleEl.innerText = analysisData[featureId].title;
+                        analysisTextEl.innerText = analysisData[featureId].text;
+                    }
+                });
+            });
+
+            // Brainstorm Hybrid Logic
+            const brainstormAchievedBtn = document.getElementById('brainstorm-achieved');
+            const brainstormSkipBtn = document.getElementById('brainstorm-skip');
+            const celebrationToast = document.getElementById('brainstorm-celebration');
+            const brainstormInput = document.getElementById('brainstorm-input');
+            const ideasModal = document.getElementById('ideas-modal');
+            const openModalBtn = document.getElementById('brainstorm-ideas-btn');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const suggestionsList = document.getElementById('suggestions-list');
+            const brainstormDifficultyEl = document.getElementById('brainstorm-difficulty');
+
+            let brainstormDifficulty = 4; // Start at level 4
+
+             const brainstormSuggestions = [
+                "Outline the first 3 steps to start that project you've been avoiding.",
+                "List 5 ways to make a recurring chore more enjoyable.",
+                "Plan a healthy but simple dinner for tomorrow.",
+                "Think of one person to reconnect with and draft a short message.",
+                "Identify one source of clutter and plan how to clear it in 15 minutes.",
+                "Find a solution for that one small, annoying daily problem.",
+                "Brainstorm a gift idea for an upcoming birthday or event.",
+                "What is one skill you'd like to learn? List 3 resources to start.",
+                "Plan a 30-minute activity for this weekend that will help you relax."
+            ];
+
+            function updateDifficultyDisplay() {
+                brainstormDifficultyEl.textContent = `Difficulty: ${brainstormDifficulty}/10`;
+            }
+
+            function populateSuggestions() {
+                suggestionsList.innerHTML = '';
+                brainstormSuggestions.forEach(suggestion => {
+                    const li = document.createElement('li');
+                    li.textContent = suggestion;
+                    li.className = 'suggestion-item p-2 rounded-md cursor-pointer';
+                    li.addEventListener('click', () => {
+                        brainstormInput.value = suggestion;
+                        ideasModal.classList.add('hidden');
+                    });
+                    suggestionsList.appendChild(li);
+                });
+            }
+
+            openModalBtn.addEventListener('click', () => {
+                ideasModal.classList.remove('hidden');
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                ideasModal.classList.add('hidden');
+            });
+            
+            ideasModal.addEventListener('click', (e) => {
+                if (e.target === ideasModal) {
+                    ideasModal.classList.add('hidden');
+                }
+            });
+            
+            function showCelebration() {
+                celebrationToast.style.opacity = '1';
+                celebrationToast.style.transform = 'translateY(0)';
+                setTimeout(() => {
+                    celebrationToast.style.opacity = '0';
+                    celebrationToast.style.transform = 'translateY(-1rem)';
+                }, 2000);
+            }
+
+            brainstormAchievedBtn.addEventListener('click', () => {
+                if (brainstormInput.value.trim() !== '') {
+                    showCelebration();
+                    brainstormDifficulty = Math.min(10, brainstormDifficulty + 1);
+                    updateDifficultyDisplay();
+                    brainstormInput.value = '';
+                }
+            });
+
+            brainstormSkipBtn.addEventListener('click', () => {
+                brainstormDifficulty = Math.max(1, brainstormDifficulty - 3);
+                updateDifficultyDisplay();
+                brainstormInput.value = '';
+                celebrationToast.style.opacity = '0';
+            });
+            
+            updateDifficultyDisplay(); // Initial display
+            populateSuggestions();
+
+
+            const ctx = document.getElementById('difficultyChart').getContext('2d');
+            const difficultyChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Easy Tasks (1-3)', 'Medium Tasks (4-7)', 'Hard Tasks (8-10)'],
+                    datasets: [{
+                        label: 'Task Difficulty Balance',
+                        data: [1, 1, 1],
+                        backgroundColor: [
+                            '#5eead4', // teal-300
+                            '#2dd4bf', // teal-400
+                            '#0d9488'  // teal-600
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#475569', // slate-600
+                                font: {
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += '1 task planned';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
